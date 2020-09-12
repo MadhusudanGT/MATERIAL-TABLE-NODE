@@ -1,3 +1,4 @@
+const { response } = require("express");
 const Mattablemodel = require("../modules/mattable.model");
 
 
@@ -58,28 +59,31 @@ exports.create = (req, res) => {
       });
   };
 
-  exports.update = (req, res) => {
+  exports.update =async (req, res) => {
     if (!req.body) {
       return res.status(400).send({
         message: "Data to update can not be empty!"
       });
     }
   
-    const id = req.params._id;
+    const givenid = req.params.id;
   
-    Mattablemodel.findOneAndUpdate(id, req.body,{ useFindAndModify: false })
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot update  with id=${id}. Maybe  was not found!`
-          });
-        } else res.send({ message: "mattable as updated successfully." });
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Error updating Tutorial with id=" + id
-        });
-      });
+    console.log(givenid)
+    //console.log(req.body)
+    try {
+      let data=await Mattablemodel.findById(req.body._id)
+      
+      data.name=req.body.name
+      data.progress=req.body.progress;
+      data.color=req.body.color;
+
+     await data.save()
+      console.log(data)
+     res.send(data)
+    } catch (error) {
+      res.send(error)
+    }
+     
    };
 
 
